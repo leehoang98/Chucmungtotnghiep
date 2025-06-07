@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chúc Mừng Tốt Nghiệp!</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .background-slider {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+    }
+
+    .slide.active {
+      opacity: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-direction: column;
+      height: 100vh;
+      color: white;
+      text-align: center;
+    }
+
+    .message-wrapper {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px 40px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .message {
+      font-size: 3.5em;
+      font-weight: bold;
+      text-shadow:
+        1px 1px 0 #ccc,
+        2px 2px 0 #bbb,
+        3px 3px 0 #aaa,
+        4px 4px 0 #999,
+        5px 5px 0 #888,
+        6px 6px 5px rgba(0,0,0,0.4);
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow:
+          1px 1px 0 #fff,
+          2px 2px 2px #ffcc00,
+          3px 3px 6px #ff9900;
+      }
+      to {
+        text-shadow:
+          2px 2px 0 #fff,
+          4px 4px 6px #ffcc00,
+          6px 6px 10px #ff6600;
+      }
+    }
+
+    .firework3d {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .spark {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: hsl(var(--hue), 100%, 60%);
+      border-radius: 50%;
+      top: 40px;
+      left: 40px;
+      animation: explode 1s ease-out infinite;
+    }
+
+    @keyframes explode {
+      0% {
+        transform: scale(0.2) translate(0, 0);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.5) translate(var(--dx), var(--dy));
+        opacity: 0;
+      }
+    }
+
+    .confetti, .flower {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .flower {
+      background: pink;
+      animation: float 10s linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .scroll-text {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      z-index: 4;
+    }
+
+    .scroll-text span {
+      display: inline-block;
+      padding-left: 100%;
+      font-size: 1.5em;
+      color: #ffeb8a;
+      animation: scroll-left 15s linear infinite;
+      text-shadow: 1px 1px 4px black;
+    }
+
+    @keyframes scroll-left {
+      0% {
+        transform: translateX(0%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ảnh nền trượt -->
+  <div class="background-slider" id="slider">
+    <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80');"></div>
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1600&q=80');"></div>
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80');"></div>
+  </div>
+
+  <div class="container">
+    <div class="message-wrapper">
+      <div class="firework3d" id="fw-left"></div>
+      <div class="message">🎓 Chúc Mừng Tốt Nghiệp! 🎉</div>
+      <div class="firework3d" id="fw-right"></div>
+    </div>
+
+    <div class="scroll-text">
+      <span>🌟 Chúc em đạt được những gì mình theo đuổi! 🌈💪</span>
+    </div>
+  </div>
+
+  <script>
+    // Slider
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 5000); // 5 giây đổi ảnh
+
+    // Confetti
+    for (let i = 0; i < 100; i++) {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti";
+      confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 60%)`;
+      confetti.style.left = Math.random() * 100 + "vw";
+      confetti.style.top = -20 + "px";
+      confetti.style.animation = `fall ${3 + Math.random() * 3}s linear infinite`;
+      document.body.appendChild(confetti);
+    }
+
+    // Flowers
+    for (let i = 0; i < 30; i++) {
+      const flower = document.createElement("div");
+      flower.className = "flower";
+      flower.style.left = Math.random() * 100 + "vw";
+      flower.style.bottom = -20 + "px";
+      flower.style.backgroundColor = ["pink", "white", "lightblue", "lightyellow"][Math.floor(Math.random() * 4)];
+      flower.style.animationDelay = Math.random() * 5 + "s";
+      document.body.appendChild(flower);
+    }
+
+    // Fireworks 3D
+    function createSparks(container) {
+      for (let i = 0; i < 15; i++) {
+        const spark = document.createElement("div");
+        spark.className = "spark";
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = 40 + Math.random() * 30;
+        const dx = Math.cos(angle) * radius;
+        const dy = Math.sin(angle) * radius;
+        spark.style.setProperty('--dx', `${dx}px`);
+        spark.style.setProperty('--dy', `${dy}px`);
+        spark.style.setProperty('--hue', Math.floor(Math.random() * 360));
+        spark.style.animationDelay = `${Math.random()}s`;
+        container.appendChild(spark);
+      }
+    }
+
+    createSparks(document.getElementById("fw-left"));
+    createSparks(document.getElementById("fw-right"));
+  </script>
+</body>
+</html>
