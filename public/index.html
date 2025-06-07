@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chúc mừng tốt nghiệp thạc sỹ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      perspective: 1000px;
+    }
+
+    #main-screen {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+    }
+
+    /* Hiệu ứng nền phức tạp */
+    .background-effects {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0.7;
+      animation: float 15s infinite linear;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      opacity: 0.8;
+      animation: confetti-fall 5s linear infinite;
+    }
+
+    /* Hiệu ứng tiêu đề nâng cao */
+    .title-container {
+      position: relative;
+      margin-bottom: 20px;
+      perspective: 500px;
+    }
+
+    .title {
+      font-size: 3.5em;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px rgba(255, 46, 99, 0.7), 
+                   0 0 30px rgba(255, 46, 99, 0.5),
+                   0 0 45px rgba(255, 46, 99, 0.3);
+      letter-spacing: 2px;
+      background: linear-gradient(45deg, #ff6a00, #ee0979, #ff2e63, #ffcc00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      background-size: 300% 300%;
+      animation: gradient-shift 8s ease infinite;
+      user-select: none;
+      transform: translateZ(50px);
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 700px;
+      line-height: 1.7;
+      margin: 0 auto 30px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-align: center;
+      padding: 0 20px;
+      position: relative;
+    }
+
+    .subtitle::after {
+      content: '';
+      display: block;
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(to right, transparent, #ff2e63, transparent);
+      margin: 20px auto 0;
+      border-radius: 50%;
+    }
+
+    /* Marquee nâng cấp */
+    .marquee-container {
+      width: 100%;
+      max-width: 800px;
+      overflow: hidden;
+      position: relative;
+      padding: 15px 0;
+      margin: 20px 0;
+    }
+
+    .marquee-container::before,
+    .marquee-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 100px;
+      height: 100%;
+      z-index: 2;
+    }
+
+    .marquee-container::before {
+      left: 0;
+      background: linear-gradient(to right, rgba(0,0,0,1), rgba(0,0,0,0));
+    }
+
+    .marquee-container::after {
+      right: 0;
+      background: linear-gradient(to left, rgba(0,0,0,1), rgba(0,0,0,0));
+    }
+
+    #marquee-text {
+      width: 100%;
+      white-space: nowrap;
+      font-size: 1.6em;
+      color: #fff;
+      text-shadow: 0 0 10px #ff2e63;
+      padding: 8px 0;
+      user-select: none;
+    }
+
+    #marquee-text span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 18s linear infinite;
+    }
+
+    /* Nút bấm đẹp mắt */
+    .btn-container {
+      position: relative;
+      margin-top: 20px;
+      z-index: 10;
+    }
+
+    #btn-click {
+      font-size: 1.8em;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(45deg, #ff6a00, #ee0979, #ff2e63);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(238, 9, 121, 0.4);
+      transition: all 0.4s ease;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      letter-spacing: 1px;
+    }
+
+    #btn-click::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: 0.5s;
+    }
+
+    #btn-click:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(238, 9, 121, 0.6);
+    }
+
+    #btn-click:hover::before {
+      left: 100%;
+    }
+
+    #btn-click:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 10px rgba(238, 9, 121, 0.4);
+    }
+
+    /* Hiệu ứng hoạt hình */
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-100px) rotate(0deg); }
+      100% { transform: translateY(100vh) rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hiệu ứng hình nền động */
+    .dynamic-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(36, 36, 62, 0.8) 0%, rgba(15, 12, 41, 0.9) 100%);
+      z-index: -1;
+    }
+
+    .floating-icon {
+      position: absolute;
+      font-size: 3em;
+      opacity: 0.2;
+      animation: float-icon 25s infinite linear;
+    }
+
+    @keyframes float-icon {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(100px, 200px) rotate(90deg); }
+      50% { transform: translate(200px, 0) rotate(180deg); }
+      75% { transform: translate(100px, -200px) rotate(270deg); }
+      100% { transform: translate(0, 0) rotate(360deg); }
+    }
+
+    /* Hiệu ứng hộp quà và đường hầm */
+    #gift-box {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      z-index: 100;
+      background: url('https://cdn-icons-png.flaticon.com/512/3194/3194889.png') center/contain no-repeat;
+      transform: scale(1);
+      transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #tunnel-effect {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: #ff2e63;
+      transform: translate(-50%, -50%);
+      z-index: 99;
+      opacity: 0;
+      transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .tunnel-active #tunnel-effect {
+      width: 200vmax;
+      height: 200vmax;
+      opacity: 0.9;
+    }
+
+    .tunnel-active #gift-box {
+      opacity: 1;
+      transform: scale(0.1) rotate(360deg);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2.5em;
+      }
+      
+      .subtitle {
+        font-size: 1.1em;
+        max-width: 90%;
+      }
+      
+      #marquee-text {
+        font-size: 1.2em;
+      }
+      
+      #btn-click {
+        font-size: 1.5em;
+        padding: 12px 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="main-screen">
+    <div class="background-effects" id="particles"></div>
+    <div class="dynamic-bg"></div>
+    
+    <div id="gift-box"></div>
+    <div id="tunnel-effect"></div>
+    
+    <div class="title-container">
+      <h1 class="title">🎓 Chúc Mừng Tốt Nghiệp Thạc Sỹ! 🎉</h1>
+      <p class="subtitle">Với sự nỗ lực và kiên trì, em đã chinh phục được đỉnh cao tri thức mới. Chúc em luôn thành công và hạnh phúc trên con đường phía trước!</p>
+    </div>
+
+    <div class="marquee-container">
+      <div id="marquee-text">
+        <span>✨ Chúc em luôn thành công trên con đường em chọn ✨ Sức khỏe - Hạnh phúc - Thành công ✨ Tương lai rộng mở ✨</span>
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button id="btn-click">
+        <i class="fas fa-gift"></i> Khám phá món quà
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Tạo hiệu ứng hạt nền
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 80;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Kích thước ngẫu nhiên
+        const size = Math.random() * 15 + 5;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Vị trí ngẫu nhiên
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Màu sắc ngẫu nhiên
+        const colors = ['#ff2e63', '#ffcc00', '#4CAF50', '#2196F3', '#9C27B0'];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Thời gian animation
+        const duration = Math.random() * 20 + 10;
+        particle.style.animationDuration = `${duration}s`;
+        
+        // Delay ngẫu nhiên
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Tạo hiệu ứng confetti
+    function createConfetti() {
+      const confettiCount = 60;
+      
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        
+        // Kích thước ngẫu nhiên
+        const size = Math.random() * 10 + 5;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${size}px`;
+        
+        // Vị trí ngẫu nhiên
+        confetti.style.left = `${Math.random() * 100}%`;
+        
+        // Màu sắc ngẫu nhiên
+        const colors = ['#ff2e63', '#ffcc00', '#4CAF50', '#2196F3', '#9C27B0'];
+        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Hình dạng
+        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        
+        // Thời gian rơi
+        const duration = Math.random() * 4 + 3;
+        confetti.style.animationDuration = `${duration}s`;
+        
+        // Delay ngẫu nhiên
+        confetti.style.animationDelay = `${Math.random() * 2}s`;
+        
+        document.querySelector('.background-effects').appendChild(confetti);
+      }
+    }
+    
+    // Tạo icon trôi nổi
+    function createFloatingIcons() {
+      const icons = ['🎓', '📚', '🏆', '💼', '🌟', '🎉', '✨', '💡'];
+      const container = document.querySelector('.background-effects');
+      
+      icons.forEach((icon, index) => {
+        const iconEl = document.createElement('div');
+        iconEl.classList.add('floating-icon');
+        iconEl.textContent = icon;
+        
+        // Vị trí ngẫu nhiên
+        iconEl.style.left = `${Math.random() * 90 + 5}%`;
+        iconEl.style.top = `${Math.random() * 90 + 5}%`;
+        
+        // Kích thước
+        const size = Math.random() * 2 + 1;
+        iconEl.style.fontSize = `${size}em`;
+        
+        // Delay animation
+        iconEl.style.animationDelay = `${index * 2}s`;
+        
+        container.appendChild(iconEl);
+      });
+    }
+    
+    // Thêm hiệu ứng cho nút khi click
+    document.getElementById('btn-click').addEventListener('click', function() {
+      // Tạo hiệu ứng confetti
+      createConfetti();
+      
+      // Hiển thị hộp quà ở vị trí nút bấm
+      const buttonRect = this.getBoundingClientRect();
+      const giftBox = document.getElementById('gift-box');
+      giftBox.style.opacity = '1';
+      giftBox.style.left = `${buttonRect.left + buttonRect.width/2}px`;
+      giftBox.style.top = `${buttonRect.top + buttonRect.height/2}px`;
+      
+      // Kích hoạt hiệu ứng đường hầm
+      document.body.classList.add('tunnel-active');
+      
+      // Chuyển trang sau khi hiệu ứng hoàn tất
+      setTimeout(() => {
+        window.location.href = 'traitim.html';
+      }, 1500);
+    });
+    
+    // Khởi tạo hiệu ứng khi trang tải
+    window.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      createFloatingIcons();
+      
+      // Hiệu ứng fade in cho nội dung
+      const mainScreen = document.getElementById('main-screen');
+      mainScreen.style.opacity = '0';
+      mainScreen.style.transition = 'opacity 1.5s ease-in-out';
+      
+      // Hiệu ứng riêng cho subtitle
+      const subtitle = document.querySelector('.subtitle');
+      subtitle.style.animation = 'fadeIn 1.5s ease-out forwards';
+      subtitle.style.animationDelay = '0.5s';
+      subtitle.style.opacity = '0';
+      
+      setTimeout(() => {
+        mainScreen.style.opacity = '1';
+      }, 300);
+    });
+  </script>
+</body>
+</html>

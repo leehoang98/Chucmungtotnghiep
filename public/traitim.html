@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hiệu ứng trái tim & pháo hoa</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0; height: 100%; overflow: hidden;
+      background: #000;
+      color: #ff2e63;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #heart-screen {
+      position: relative;
+      height: 100vh; width: 100vw;
+      background: #000;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 30px;
+      color: #ff2e63;
+      z-index: 10;
+      overflow: hidden;
+    }
+    #heart-text {
+      font-size: 3em;
+      font-weight: 900;
+      text-shadow: 2px 2px 10px #b30027;
+      pointer-events: none;
+      user-select: none;
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    /* Chữ chạy */
+    #heart-text span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 10s linear infinite;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    canvas#heart, canvas#fireworks {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      user-select: none;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="heart-screen">
+    <canvas id="heart"></canvas>
+    <canvas id="fireworks"></canvas>
+    <div id="heart-text"><span>Chúc em luôn thành công trong cuộc sống 🎉🎉🎉</span></div>
+  </div>
+
+  <script>
+    // ----- Hiệu ứng trái tim -----
+    function initHeartCanvas() {
+      const canvas = document.getElementById('heart');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      const isDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
+
+      function resize() {
+        const koef = isDevice ? 0.5 : 1;
+        width = canvas.width = koef * window.innerWidth;
+        height = canvas.height = koef * window.innerHeight;
+        ctx.fillStyle = "rgba(0,0,0,1)";
+        ctx.fillRect(0, 0, width, height);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function heartPosition(rad) {
+        return [
+          Math.pow(Math.sin(rad), 3),
+          -(15 * Math.cos(rad) - 5 * Math.cos(2 * rad) - 2 * Math.cos(3 * rad) - Math.cos(4 * rad))
+        ];
+      }
+      function scaleAndTranslate(pos, sx, sy, dx, dy) {
+        return [dx + pos[0] * sx, dy + pos[1] * sy];
+      }
+
+      const traceCount = isDevice ? 20 : 50;
+      const pointsOrigin = [];
+      const dr = isDevice ? 0.3 : 0.1;
+      for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 210, 13, 0, 0));
+      for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 150, 9, 0, 0));
+      for (let i = 0; i < Math.PI * 2; i += dr) pointsOrigin.push(scaleAndTranslate(heartPosition(i), 90, 5, 0, 0));
+
+      const heartPointsCount = pointsOrigin.length;
+      const targetPoints = [];
+
+      const pulse = function (kx, ky) {
+        for (let i = 0; i < pointsOrigin.length; i++) {
+          targetPoints[i] = [];
+          targetPoints[i][0] = kx * pointsOrigin[i][0] + width / 2;
+          targetPoints[i][1] = ky * pointsOrigin[i][1] + height / 2;
+        }
+      };
+
+      const e = [];
+      const rand = Math.random;
+      for (let i = 0; i < heartPointsCount; i++) {
+        let x = rand() * width;
+        let y = rand() * height;
+        e[i] = {
+          vx: 0,
+          vy: 0,
+          R: 2,
+          speed: rand() + 5,
+          q: ~~(rand() * heartPointsCount),
+          D: 2 * (i % 2) - 1,
+          force: 0.2 * rand() + 0.7,
+          f: "hsla(0," + ~~(40 * rand() + 60) + "%," + ~~(60 * rand() + 20) + "%,.3)",
+          trace: []
+        };
+        for (let k = 0; k < traceCount; k++) e[i].trace[k] = { x: x, y: y };
+      }
+
+      const config = {
+        traceK: 0.4,
+        timeDelta: 0.01
+      };
+
+      let time = 0;
+
+      function loop() {
+        const n = -Math.cos(time);
+        pulse((1 + n) * .5, (1 + n) * .5);
+        time += ((Math.sin(time)) < 0 ? 9 : (n > 0.8) ? .2 : 1) * config.timeDelta;
+        ctx.fillStyle = "rgba(0,0,0,.1)";
+        ctx.fillRect(0, 0, width, height);
+        for (let i = e.length - 1; i >= 0; i--) {
+          let u = e[i];
+          let q = targetPoints[u.q];
+          let dx = u.trace[0].x - q[0];
+          let dy = u.trace[0].y - q[1];
+          let length = Math.sqrt(dx * dx + dy * dy);
+          if (length < 10) {
+            if (Math.random() > 0.95) {
+              u.q = ~~(Math.random() * heartPointsCount);
+            } else {
+              if (Math.random() > 0.99) {
+                u.D *= -1;
+              }
+              u.q += u.D;
+              u.q %= heartPointsCount;
+              if (u.q < 0) u.q += heartPointsCount;
+            }
+          }
+          u.vx += (-dx / length) * u.speed;
+          u.vy += (-dy / length) * u.speed;
+          u.trace[0].x += u.vx;
+          u.trace[0].y += u.vy;
+          u.vx *= u.force;
+          u.vy *= u.force;
+          for (let k = 0; k < u.trace.length - 1; k++) {
+            let T = u.trace[k];
+            let N = u.trace[k + 1];
+            N.x -= config.traceK * (N.x - T.x);
+            N.y -= config.traceK * (N.y - T.y);
+          }
+          ctx.fillStyle = u.f;
+          for (let k = 0; k < u.trace.length; k++) {
+            ctx.fillRect(u.trace[k].x, u.trace[k].y, 1, 1);
+          }
+        }
+        window.requestAnimationFrame(loop);
+      }
+
+      loop();
+    }
+
+    // ----- Hiệu ứng pháo hoa 3D -----
+    function initFireworksCanvas() {
+      const canvas = document.getElementById('fireworks');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Particle class
+      class Particle {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.color = color;
+          this.speed = Math.random() * 4 + 1;
+          this.angle = Math.random() * 2 * Math.PI;
+          this.radius = Math.random() * 2 + 1;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.015 + 0.003;
+          this.vx = Math.cos(this.angle) * this.speed;
+          this.vy = Math.sin(this.angle) * this.speed;
+          this.gravity = 0.05;
+        }
+        update() {
+          this.vx *= 0.95;
+          this.vy += this.gravity;
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+        }
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = this.alpha;
+          ctx.beginPath();
+          ctx.fillStyle = this.color;
+          ctx.shadowColor = this.color;
+          ctx.shadowBlur = 8;
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      let fireworks = [];
+      let lastTime = 0;
+      function createFirework() {
+        const x = Math.random() * width * 0.8 + width * 0.1;
+        const y = Math.random() * height * 0.4 + height * 0.1;
+        const colors = ['#ff2e63', '#ff6a00', '#ee0979', '#f9c80e', '#6a2c70'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const count = 30 + Math.floor(Math.random() * 20);
+        let particles = [];
+        for (let i = 0; i < count; i++) {
+          particles.push(new Particle(x, y, color));
+        }
+        fireworks.push(particles);
+      }
+
+      function animate(time = 0) {
+        ctx.clearRect(0, 0, width, height);
+        if (time - lastTime > 1000) {
+          createFirework();
+          lastTime = time;
+        }
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+          let particles = fireworks[i];
+          for (let j = particles.length - 1; j >= 0; j--) {
+            let p = particles[j];
+            p.update();
+            if (p.alpha <= 0) particles.splice(j, 1);
+            else p.draw();
+          }
+          if (particles.length === 0) fireworks.splice(i, 1);
+        }
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
+    window.onload = () => {
+      initHeartCanvas();
+      initFireworksCanvas();
+    };
+  </script>
+</body>
+</html>
